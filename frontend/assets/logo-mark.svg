@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-80 -62 160 124" role="img" aria-label="Evantis mark">
+  <defs>
+    <!-- Clip to left circle — used to reveal only the intersection portion of the right circle -->
+    <clipPath id="m-cl">
+      <circle cx="-22" cy="0" r="52"/>
+    </clipPath>
+    <!-- Clip to right circle — used to reveal only the intersection portion of the left circle -->
+    <clipPath id="m-cr">
+      <circle cx="22" cy="0" r="52"/>
+    </clipPath>
+  </defs>
+
+  <!-- Intersection fill: right circle, clipped to left circle boundary -->
+  <circle cx="22" cy="0" r="52"
+          clip-path="url(#m-cl)"
+          fill="#b8894a" fill-opacity="0.22"/>
+
+  <!-- Intersection border — stronger strokes along the overlap arc edges -->
+  <circle cx="-22" cy="0" r="52"
+          clip-path="url(#m-cr)"
+          fill="none" stroke="#b8894a" stroke-width="2.2" stroke-opacity="0.45"/>
+  <circle cx="22" cy="0" r="52"
+          clip-path="url(#m-cl)"
+          fill="none" stroke="#b8894a" stroke-width="2.2" stroke-opacity="0.45"/>
+
+  <!-- Main outer circles -->
+  <circle cx="-22" cy="0" r="52"
+          fill="none" stroke="#b8894a" stroke-width="1.2"/>
+  <circle cx="22" cy="0" r="52"
+          fill="none" stroke="#b8894a" stroke-width="1.2"/>
+
+  <!-- Inner dashed rings -->
+  <circle cx="-22" cy="0" r="42"
+          fill="none" stroke="#b8894a" stroke-width="0.7"
+          stroke-opacity="0.3" stroke-dasharray="2 5"/>
+  <circle cx="22" cy="0" r="42"
+          fill="none" stroke="#b8894a" stroke-width="0.7"
+          stroke-opacity="0.3" stroke-dasharray="2 5"/>
+
+  <!-- Italic "e" centered in the intersection -->
+  <text x="0" y="0"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="26"
+        font-style="italic"
+        fill="#b8894a"
+        text-anchor="middle"
+        dominant-baseline="central">e</text>
+</svg>

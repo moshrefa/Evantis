@@ -1,0 +1,27 @@
+# Compiled output
+target/
+
+# Environment / secrets — never commit
+.env
+
+# RAW camera files — too large for git
+*.CR3
+*.cr3
+*.RAW
+*.raw
+*.NEF
+*.nef
+*.ARW
+*.arw
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.idea/
+*.iml
+.vscode/settings.json
+
+# Logs
+*.log

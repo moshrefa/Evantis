@@ -1,0 +1,1527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evantis — Where your vision becomes beautiful reality.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0908;
+      --surface:  #1e1a17;
+      --gold:     #b8894a;
+      --gold-lt:  #d4a96a;
+      --text:     #f2ede4;
+      --muted:    #6b6560;
+      --radius:   4px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.7;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* Restore pointer on all interactive elements so Safari registers clicks */
+    a, button, input, select, textarea, label, [role="button"] {
+      cursor: none;
+      pointer-events: auto;
+    }
+
+    /* ── Custom Cursor ────────────────────────────────────────────────────── */
+    #cursor {
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      top: 0; left: 0;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.08s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s ease;
+      z-index: 9999;
+    }
+    #cursor.hover {
+      width: 24px; height: 24px;
+      background: transparent;
+      border: 1.5px solid var(--gold);
+    }
+
+    /* ── Typography ──────────────────────────────────────────────────────── */
+    h1, h2, h3, h4 { font-family: 'Playfair Display', serif; font-weight: 600; line-height: 1.2; }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .section-title span {
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 540px;
+    }
+
+    /* ── Scroll Animations ───────────────────────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Gold Divider ────────────────────────────────────────────────────── */
+    .gold-line {
+      width: 52px; height: 1.5px;
+      background: var(--gold);
+      margin: 1.25rem 0 2rem;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 0.85rem 2.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: var(--radius);
+      cursor: none;
+      transition: background 0.25s, color 0.25s, transform 0.2s;
+    }
+    .btn-gold {
+      background: var(--gold);
+      color: var(--bg);
+    }
+    .btn-gold:hover {
+      background: var(--gold-lt);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+    }
+    .btn-outline:hover {
+      background: var(--gold);
+      color: var(--bg);
+      transform: translateY(-2px);
+    }
+
+    /* ── Navigation ──────────────────────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 70px;
+      padding: 0 4%;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    #navbar.scrolled {
+      background: var(--surface);
+      box-shadow: 0 2px 30px rgba(0,0,0,0.4);
+    }
+
+    /* Nav logo — inline SVG wrapper */
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      line-height: 0;
+      flex-shrink: 0;
+    }
+    .nav-logo svg {
+      height: 36px;
+      width: auto;
+      display: block;
+    }
+
+    /* Wordmark fill — dark bg default (#f2ede4), light bg override (#0a0908) */
+    .logo-wordmark { fill: var(--text); transition: fill 0.3s; }
+    #navbar.light-bg .logo-wordmark { fill: #0a0908; }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta { display: flex; align-items: center; gap: 1rem; }
+
+    /* Hamburger */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: none;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .hamburger span {
+      display: block; width: 24px; height: 1.5px;
+      background: var(--text);
+      transition: all 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .mobile-menu a:hover { color: var(--gold); }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 4% 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 60% at 50% 40%, rgba(184,137,74,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(184,137,74,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 820px; }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3.5rem, 9vw, 7.5rem);
+      font-weight: 700;
+      line-height: 1.0;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .hero-tagline {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted);
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      margin-bottom: 3rem;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .hero-scroll-line {
+      width: 1px; height: 40px;
+      background: linear-gradient(to bottom, var(--gold), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    /* ── Section Layout ──────────────────────────────────────────────────── */
+    section {
+      padding: 6rem 4%;
+      position: relative;
+    }
+
+    .section-header { margin-bottom: 3.5rem; }
+
+    /* ── Services ────────────────────────────────────────────────────────── */
+    #services { background: var(--surface); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+
+    .service-card {
+      background: var(--bg);
+      padding: 3.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .service-card:hover { background: #120f0c; }
+    .service-card:hover::before { opacity: 1; }
+
+    .service-icon {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      display: block;
+    }
+
+    .service-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    .service-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .service-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    .service-features li {
+      font-size: 0.88rem;
+      color: var(--muted);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid rgba(107,101,96,0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .service-features li::before {
+      content: '';
+      display: block;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── Gallery ─────────────────────────────────────────────────────────── */
+    /* ── Vendor Sections ─────────────────────────────────────────────── */
+    #photographers { background: var(--bg); }
+    #decorators    { background: var(--surface); }
+
+    .vendors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 2rem;
+      margin-top: 2.5rem;
+    }
+
+    .vendor-card {
+      background: var(--surface);
+      border: 1px solid rgba(184,137,74,0.15);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    #decorators .vendor-card { background: var(--bg); }
+    .vendor-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+
+    .vendor-card-img {
+      width: 100%; height: 210px;
+      background: rgba(184,137,74,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; color: rgba(184,137,74,0.25);
+      overflow: hidden;
+    }
+    .vendor-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .vendor-card-body { padding: 1.4rem; }
+    .vendor-card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem; color: var(--text); margin-bottom: 0.25rem;
+    }
+    .vendor-card-location {
+      font-size: 0.78rem; color: var(--gold);
+      text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.7rem;
+    }
+    .vendor-card-bio {
+      font-size: 0.87rem; color: var(--muted); line-height: 1.6;
+      margin-bottom: 1.2rem;
+      display: -webkit-box; -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .vendors-empty {
+      text-align: center; color: var(--muted);
+      font-size: 0.9rem; padding: 3rem 0; grid-column: 1/-1;
+    }
+
+    /* ── Vendor Modal ────────────────────────────────────────────────── */
+    .vendor-modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(10,9,8,0.88);
+      z-index: 10000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.5rem;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .vendor-modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .vendor-modal {
+      background: var(--surface);
+      border: 1px solid rgba(184,137,74,0.2);
+      border-radius: var(--radius);
+      width: 100%; max-width: 620px;
+      max-height: 90vh; overflow-y: auto;
+      position: relative;
+      transform: translateY(18px);
+      transition: transform 0.3s;
+    }
+    .vendor-modal-overlay.open .vendor-modal { transform: translateY(0); }
+
+    .vendor-modal-img {
+      width: 100%; height: 250px;
+      background: rgba(184,137,74,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4rem; color: rgba(184,137,74,0.22); overflow: hidden;
+    }
+    .vendor-modal-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .vendor-modal-close {
+      position: absolute; top: 0.85rem; right: 0.85rem;
+      background: rgba(10,9,8,0.65); border: none; color: var(--text);
+      width: 34px; height: 34px; border-radius: 50%;
+      font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vendor-modal-body { padding: 1.75rem 2rem 2rem; }
+    .vendor-modal-cat {
+      font-size: 0.72rem; text-transform: uppercase;
+      letter-spacing: 0.12em; color: var(--gold); margin-bottom: 0.4rem;
+    }
+    .vendor-modal-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem; color: var(--text); margin-bottom: 0.2rem;
+    }
+    .vendor-modal-brand { font-size: 0.88rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .vendor-modal-bio {
+      font-size: 0.9rem; color: rgba(242,237,228,0.8);
+      line-height: 1.75; margin-bottom: 1.4rem;
+    }
+    .vendor-modal-meta {
+      display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.8rem;
+    }
+    .vendor-modal-meta span { font-size: 0.84rem; color: var(--muted); }
+    .vendor-modal-meta a { font-size: 0.84rem; color: var(--gold-lt); text-decoration: none; }
+    .vendor-modal-meta a:hover { text-decoration: underline; }
+    .vendor-modal-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .modal-packages-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem; color: var(--text);
+      margin: 1.75rem 0 1rem; padding-top: 1.5rem;
+      border-top: 1px solid rgba(184,137,74,0.15);
+    }
+    .modal-packages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 0.85rem; margin-bottom: 1.75rem;
+    }
+    .modal-pkg-card {
+      background: var(--bg);
+      border: 1px solid rgba(184,137,74,0.12);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+    }
+    .modal-pkg-name {
+      font-size: 0.78rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--gold); margin-bottom: 0.3rem;
+    }
+    .modal-pkg-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.25rem; color: var(--text); margin-bottom: 0.5rem;
+    }
+    .modal-pkg-desc {
+      font-size: 0.78rem; color: var(--muted); line-height: 1.5; margin-bottom: 0.75rem;
+    }
+    .modal-pkg-features { list-style: none; padding: 0; margin: 0; }
+    .modal-pkg-features li {
+      font-size: 0.77rem; color: rgba(242,237,228,0.65);
+      padding: 0.2rem 0; display: flex; gap: 0.4rem; align-items: baseline;
+    }
+    .modal-pkg-features li::before { content: "✦"; color: var(--gold); font-size: 0.55rem; flex-shrink: 0; }
+
+    #gallery { background: var(--bg); overflow: hidden; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: 220px;
+      gap: 6px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+      background: var(--surface);
+    }
+    .gallery-item.tall { grid-row: span 2; }
+    .gallery-item.wide { grid-column: span 2; }
+
+    .gallery-item img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease, filter 0.4s ease;
+      filter: brightness(0.85) saturate(0.9);
+      display: block; /* removes inline gap that can cause overflow */
+    }
+    .gallery-item:hover img {
+      transform: scale(1.06);
+      filter: brightness(1) saturate(1.1);
+    }
+
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,9,8,0.7) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+    }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+    .gallery-overlay span {
+      font-size: 0.75rem;
+      color: var(--gold);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    /* ── Pricing ─────────────────────────────────────────────────────────── */
+    #pricing { background: var(--surface); }
+
+    .pricing-category-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      font-style: italic;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .pricing-category-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(184,137,74,0.25);
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .pricing-card {
+      background: var(--bg);
+      border: 1px solid rgba(107,101,96,0.2);
+      padding: 2.5rem 2rem;
+      position: relative;
+      transition: border-color 0.3s, transform 0.3s;
+      border-radius: var(--radius);
+    }
+    .pricing-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-4px);
+    }
+    .pricing-card.featured {
+      border-color: var(--gold);
+      background: #120f0c;
+    }
+
+    .pricing-badge {
+      position: absolute;
+      top: -1px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 1rem;
+      border-radius: 0 0 var(--radius) var(--radius);
+    }
+
+    .pricing-tier {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .pricing-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .pricing-price sup {
+      font-size: 1.1rem;
+      vertical-align: super;
+      font-weight: 400;
+      color: var(--gold);
+    }
+
+    .pricing-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.75rem;
+      border-bottom: 1px solid rgba(107,101,96,0.2);
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 2rem;
+    }
+    .pricing-features li {
+      font-size: 0.87rem;
+      color: var(--muted);
+      padding: 0.45rem 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .pricing-features li::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 0.55rem;
+      margin-top: 0.45rem;
+      flex-shrink: 0;
+    }
+
+    /* ── Contact ─────────────────────────────────────────────────────────── */
+    #contact { background: var(--bg); }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .contact-info h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+    .contact-info p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .contact-detail-icon {
+      width: 38px; height: 38px;
+      border: 1px solid rgba(184,137,74,0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      color: var(--gold);
+    }
+    .contact-detail-text {
+      font-size: 0.88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .contact-detail-text strong {
+      display: block;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 0.1rem;
+    }
+
+    /* Form */
+    .inquiry-form { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.45rem; }
+
+    .form-group label {
+      font-size: 0.73rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--surface);
+      border: 1px solid rgba(107,101,96,0.3);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 300;
+      padding: 0.85rem 1rem;
+      transition: border-color 0.2s;
+      outline: none;
+      width: 100%;
+      cursor: none;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(107,101,96,0.6); }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6560' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+    }
+    .form-group select option { background: var(--surface); }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    .form-submit { display: flex; align-items: center; gap: 1.5rem; margin-top: 0.5rem; }
+
+    /* Success message */
+    .form-success {
+      display: none;
+      background: rgba(184,137,74,0.1);
+      border: 1px solid rgba(184,137,74,0.3);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--gold-lt);
+      font-size: 0.95rem;
+    }
+    .form-success.visible { display: block; }
+
+    .form-error-msg {
+      display: none;
+      font-size: 0.82rem;
+      color: #c0675a;
+    }
+    .form-error-msg.visible { display: block; }
+
+    /* ── Footer ──────────────────────────────────────────────────────────── */
+    footer {
+      background: var(--surface);
+      padding: 3rem 4%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(107,101,96,0.15);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      color: var(--text);
+      font-style: italic;
+    }
+    .footer-logo span { color: var(--gold); }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    footer nav { display: flex; gap: 2rem; }
+    footer nav a {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    footer nav a:hover { color: var(--gold); }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-item.wide { grid-column: span 1; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
+      .contact-layout { grid-template-columns: 1fr; gap: 3rem; }
+      .nav-links, .nav-cta .btn { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    @media (max-width: 600px) {
+      .gallery-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      section { padding: 4rem 5%; }
+      .service-card { padding: 2.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+
+<!-- Mobile menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#services" onclick="closeMobile()">Services</a>
+  <a href="#gallery"  onclick="closeMobile()">Gallery</a>
+  <a href="#pricing"  onclick="closeMobile()">Pricing</a>
+  <a href="#contact"  onclick="closeMobile()">Contact</a>
+</div>
+
+<!-- ── Navigation ───────────────────────────────────────────────────────── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo" aria-label="Evantis — home">
+    <!--
+      Inline SVG logo — mark + wordmark.
+      Coordinates are absolute (no inner scale transform) so stroke weights
+      are predictable. The .logo-wordmark fill is CSS-controlled:
+        default  → var(--text) / #f2ede4  (dark backgrounds)
+        .light-bg → #0a0908              (light backgrounds)
+    -->
+    <svg viewBox="0 0 215 60" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+      <defs>
+        <!-- Clip to the left circle — reveals only the intersection of the right circle -->
+        <clipPath id="nav-cl">
+          <circle cx="29" cy="30" r="26"/>
+        </clipPath>
+        <!-- Clip to the right circle — reveals only the intersection of the left circle -->
+        <clipPath id="nav-cr">
+          <circle cx="51" cy="30" r="26"/>
+        </clipPath>
+      </defs>
+
+      <!-- Intersection fill -->
+      <circle cx="51" cy="30" r="26"
+              clip-path="url(#nav-cl)"
+              fill="#b8894a" fill-opacity="0.22"/>
+
+      <!-- Stronger border along the overlap arcs -->
+      <circle cx="29" cy="30" r="26"
+              clip-path="url(#nav-cr)"
+              fill="none" stroke="#b8894a" stroke-width="1.1" stroke-opacity="0.5"/>
+      <circle cx="51" cy="30" r="26"
+              clip-path="url(#nav-cl)"
+              fill="none" stroke="#b8894a" stroke-width="1.1" stroke-opacity="0.5"/>
+
+      <!-- Main outer circles -->
+      <circle cx="29" cy="30" r="26" fill="none" stroke="#b8894a" stroke-width="0.6"/>
+      <circle cx="51" cy="30" r="26" fill="none" stroke="#b8894a" stroke-width="0.6"/>
+
+      <!-- Inner dashed rings -->
+      <circle cx="29" cy="30" r="21"
+              fill="none" stroke="#b8894a" stroke-width="0.4"
+              stroke-opacity="0.3" stroke-dasharray="1 2.5"/>
+      <circle cx="51" cy="30" r="21"
+              fill="none" stroke="#b8894a" stroke-width="0.4"
+              stroke-opacity="0.3" stroke-dasharray="1 2.5"/>
+
+      <!-- Italic e centred in the intersection (x = midpoint of both circle centres) -->
+      <text x="40" y="30"
+            font-family="Georgia,'Times New Roman',serif"
+            font-size="13" font-style="italic"
+            fill="#b8894a"
+            text-anchor="middle" dominant-baseline="central">e</text>
+
+      <!-- Wordmark — fill controlled by .logo-wordmark CSS class -->
+      <text x="88" y="30"
+            font-family="Georgia,'Times New Roman',serif"
+            font-size="28" font-style="italic"
+            class="logo-wordmark"
+            text-anchor="start" dominant-baseline="central">Evantis</text>
+    </svg>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-cta">
+    <a href="#contact" class="btn btn-outline" style="font-size:0.75rem; padding:0.6rem 1.4rem;">Book Now</a>
+    <button class="hamburger" id="hamburger" onclick="toggleMobile()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow reveal">Photography &amp; Event Decoration</p>
+    <h1 class="hero-title reveal reveal-delay-1">Ev<em>a</em>ntis</h1>
+    <p class="hero-tagline reveal reveal-delay-2">Where your vision becomes beautiful reality.</p>
+    <div class="hero-actions reveal reveal-delay-3">
+      <a href="#contact" class="btn btn-gold">Book a Consultation</a>
+      <a href="#services" class="btn btn-outline">Explore Services</a>
+    </div>
+  </div>
+  <div class="hero-scroll">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ── Services ─────────────────────────────────────────────────────────── -->
+<section id="services">
+  <div class="section-header reveal">
+    <span class="section-label">What we do</span>
+    <h2 class="section-title">Crafted for <span>every occasion</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Two disciplines, one vision — to make your event unforgettable from the first frame to the final flourish.</p>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <span class="service-icon">◎</span>
+      <h3 class="service-title">Photography</h3>
+      <p class="service-desc">We capture the unscripted moments — the glance, the laugh, the tears — with artistic precision and a timeless aesthetic that lives long after the night ends.</p>
+      <ul class="service-features">
+        <li>Weddings &amp; Engagements</li>
+        <li>Corporate &amp; Brand Events</li>
+        <li>Portraits &amp; Milestones</li>
+        <li>High-resolution edited gallery delivery</li>
+        <li>Print-ready files included</li>
+      </ul>
+      <a href="#photographers" class="btn btn-gold">Meet Photographers</a>
+    </div>
+
+    <div class="service-card reveal reveal-delay-2">
+      <span class="service-icon">✦</span>
+      <h3 class="service-title">Event Decoration</h3>
+      <p class="service-desc">From intimate celebrations to grand ballrooms, we transform spaces into living experiences — rich in detail, cohesive in design, and personal to your story.</p>
+      <ul class="service-features">
+        <li>Full venue styling &amp; concept design</li>
+        <li>Custom floral installations</li>
+        <li>Lighting design &amp; draping</li>
+        <li>Day-of coordination</li>
+        <li>Luxury &amp; custom builds available</li>
+      </ul>
+      <a href="#decorators" class="btn btn-gold">Meet Decorators</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Photographers ─────────────────────────────────────────────────────── -->
+<section id="photographers">
+  <div class="section-header reveal">
+    <span class="section-label">Photography</span>
+    <h2 class="section-title">Meet our <span>photographers</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Each photographer brings a unique eye and a passion for storytelling.</p>
+  </div>
+  <div class="vendors-grid" id="photographersGrid"></div>
+</section>
+
+<!-- ── Decorators ─────────────────────────────────────────────────────────── -->
+<section id="decorators">
+  <div class="section-header reveal">
+    <span class="section-label">Event Decoration</span>
+    <h2 class="section-title">Meet our <span>decorators</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Visionary designers who transform spaces into unforgettable experiences.</p>
+  </div>
+  <div class="vendors-grid" id="decoratorsGrid"></div>
+</section>
+
+<!-- ── Gallery ───────────────────────────────────────────────────────────── -->
+<section id="gallery">
+  <div class="section-header reveal">
+    <span class="section-label">Our work</span>
+    <h2 class="section-title">A glimpse of <span>what we create</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Each image a story. Each event a world built just for you.</p>
+  </div>
+
+  <div class="gallery-grid reveal">
+    <div class="gallery-item tall">
+      <img src="https://picsum.photos/seed/ev1/600/900" alt="Gallery 1" loading="lazy" />
+      <div class="gallery-overlay"><span>Wedding</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://picsum.photos/seed/ev2/600/400" alt="Gallery 2" loading="lazy" />
+      <div class="gallery-overlay"><span>Decoration</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://picsum.photos/seed/ev3/600/400" alt="Gallery 3" loading="lazy" />
+      <div class="gallery-overlay"><span>Portrait</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://picsum.photos/seed/ev4/600/400" alt="Gallery 4" loading="lazy" />
+      <div class="gallery-overlay"><span>Floral</span></div>
+    </div>
+    <div class="gallery-item wide">
+      <img src="https://picsum.photos/seed/ev5/900/400" alt="Gallery 5" loading="lazy" />
+      <div class="gallery-overlay"><span>Venue Styling</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://picsum.photos/seed/ev6/600/400" alt="Gallery 6" loading="lazy" />
+      <div class="gallery-overlay"><span>Corporate</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://picsum.photos/seed/ev8/600/400" alt="Gallery 7" loading="lazy" />
+      <div class="gallery-overlay"><span>Engagement</span></div>
+    </div>
+    <div class="gallery-item tall">
+      <img src="https://picsum.photos/seed/ev9/600/900" alt="Gallery 8" loading="lazy" />
+      <div class="gallery-overlay"><span>Celebration</span></div>
+    </div>
+    <div class="gallery-item wide">
+      <img src="https://picsum.photos/seed/ev10/900/400" alt="Gallery 9" loading="lazy" />
+      <div class="gallery-overlay"><span>Wedding Reception</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Pricing ───────────────────────────────────────────────────────────── -->
+<section id="pricing">
+  <div class="section-header reveal">
+    <span class="section-label">Investment</span>
+    <h2 class="section-title">Packages built for <span>your vision</span></h2>
+    <div class="gold-line"></div>
+    <p class="section-sub">Transparent pricing, no hidden fees. Every package includes our signature attention to detail.</p>
+  </div>
+
+  <!-- Photography -->
+  <p class="pricing-category-title reveal">Photography</p>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <p class="pricing-tier">Essential</p>
+      <p class="pricing-price"><sup>$</sup>800</p>
+      <p class="pricing-desc">Perfect for intimate events and smaller celebrations.</p>
+      <ul class="pricing-features">
+        <li>Up to 4 hours of coverage</li>
+        <li>100 professionally edited photos</li>
+        <li>Private online gallery</li>
+        <li>High-resolution digital files</li>
+        <li>7-day delivery</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <span class="pricing-badge">Most Popular</span>
+      <p class="pricing-tier">Signature</p>
+      <p class="pricing-price"><sup>$</sup>1,500</p>
+      <p class="pricing-desc">Our most chosen package for weddings and milestone events.</p>
+      <ul class="pricing-features">
+        <li>Up to 8 hours of coverage</li>
+        <li>300+ professionally edited photos</li>
+        <li>Second photographer included</li>
+        <li>Private online gallery</li>
+        <li>USB drive with print-ready files</li>
+        <li>5-day delivery</li>
+      </ul>
+      <a href="#contact" class="btn btn-gold" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+
+    <div class="pricing-card reveal reveal-delay-2">
+      <p class="pricing-tier">Premium</p>
+      <p class="pricing-price"><sup>$</sup>2,800</p>
+      <p class="pricing-desc">Full-day, fully immersive coverage for your most important day.</p>
+      <ul class="pricing-features">
+        <li>Full day coverage (10+ hours)</li>
+        <li>500+ professionally edited photos</li>
+        <li>Two photographers</li>
+        <li>Engagement session included</li>
+        <li>Luxury printed album</li>
+        <li>USB + online gallery</li>
+        <li>3-day rush delivery available</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+  </div>
+
+  <!-- Event Decoration -->
+  <p class="pricing-category-title reveal" style="margin-top:1rem;">Event Decoration</p>
+  <div class="pricing-grid">
+    <div class="pricing-card reveal">
+      <p class="pricing-tier">Essential</p>
+      <p class="pricing-price"><sup>$</sup>600</p>
+      <p class="pricing-desc">Elegant foundation styling for intimate gatherings.</p>
+      <ul class="pricing-features">
+        <li>Up to 50 guests</li>
+        <li>Standard floral centerpieces</li>
+        <li>Table linen &amp; chair covers</li>
+        <li>Entry display setup</li>
+        <li>Setup &amp; breakdown included</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+
+    <div class="pricing-card featured reveal reveal-delay-1">
+      <span class="pricing-badge">Most Popular</span>
+      <p class="pricing-tier">Signature</p>
+      <p class="pricing-price"><sup>$</sup>1,500</p>
+      <p class="pricing-desc">Full venue transformation with custom florals and styling.</p>
+      <ul class="pricing-features">
+        <li>Up to 150 guests</li>
+        <li>Premium custom floral design</li>
+        <li>Full table &amp; venue styling</li>
+        <li>Candle &amp; ambient lighting</li>
+        <li>Backdrop or arch included</li>
+        <li>Day-of coordination (4 hrs)</li>
+      </ul>
+      <a href="#contact" class="btn btn-gold" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+
+    <div class="pricing-card reveal reveal-delay-2">
+      <p class="pricing-tier">Luxury</p>
+      <p class="pricing-price"><sup>$</sup>3,500</p>
+      <p class="pricing-desc">A complete bespoke experience — no detail overlooked.</p>
+      <ul class="pricing-features">
+        <li>Unlimited guests</li>
+        <li>Full concept &amp; mood board design</li>
+        <li>Luxury floral installations</li>
+        <li>Custom lighting &amp; draping</li>
+        <li>Specialty rentals included</li>
+        <li>Full-day coordination team</li>
+        <li>Post-event breakdown</li>
+      </ul>
+      <a href="#contact" class="btn btn-outline" style="width:100%; text-align:center;">Book Now</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Contact ───────────────────────────────────────────────────────────── -->
+<section id="contact">
+  <div class="contact-layout">
+    <div>
+      <div class="section-header reveal">
+        <span class="section-label">Get in touch</span>
+        <h2 class="section-title">Let's plan your <span>event</span></h2>
+        <div class="gold-line"></div>
+        <p class="section-sub" style="margin-bottom:2.5rem;">Tell us about your vision. We'll be in touch within 24 hours.</p>
+      </div>
+
+      <div class="contact-detail reveal reveal-delay-1">
+        <div class="contact-detail-icon">✉</div>
+        <div class="contact-detail-text">
+          <strong>Email</strong>
+          hello@evantis.com
+        </div>
+      </div>
+      <div class="contact-detail reveal reveal-delay-2">
+        <div class="contact-detail-icon">☎</div>
+        <div class="contact-detail-text">
+          <strong>Phone</strong>
+          +1 (555) 000-0000
+        </div>
+      </div>
+      <div class="contact-detail reveal reveal-delay-3">
+        <div class="contact-detail-icon">◎</div>
+        <div class="contact-detail-text">
+          <strong>Based in</strong>
+          Leander, TX — serving Austin &amp; surrounding areas
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal reveal-delay-1">
+      <form class="inquiry-form" id="inquiryForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full Name *</label>
+            <input type="text" id="name" name="name" placeholder="Jane Smith" required />
+          </div>
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" placeholder="jane@example.com" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 (512) 000-0000" />
+          </div>
+          <div class="form-group">
+            <label for="eventType">Event Type</label>
+            <select id="eventType" name="eventType">
+              <option value="">Select event type</option>
+              <option>Wedding</option>
+              <option>Corporate Event</option>
+              <option>Birthday</option>
+              <option>Anniversary</option>
+              <option>Baby Shower</option>
+              <option>Graduation</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="eventDate">Event Date</label>
+            <input type="date" id="eventDate" name="eventDate" />
+          </div>
+          <div class="form-group">
+            <label for="guestCount">Guest Count</label>
+            <input type="number" id="guestCount" name="guestCount" placeholder="e.g. 120" min="1" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="budget">Estimated Budget ($)</label>
+          <input type="number" id="budget" name="budget" placeholder="e.g. 2500" min="0" step="100" />
+        </div>
+
+        <div class="form-group">
+          <label for="location">Event Location / Venue</label>
+          <input type="text" id="location" name="location" placeholder="Venue name or city" />
+        </div>
+
+        <div class="form-group">
+          <label for="message">Tell us about your vision</label>
+          <textarea id="message" name="message" placeholder="Share details about your event, style preferences, or anything else we should know..."></textarea>
+        </div>
+
+        <div class="form-success" id="formSuccess">
+          ✦ &nbsp; Thank you! We've received your inquiry and will be in touch within 24 hours.
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn btn-gold" id="submitBtn">Send Inquiry</button>
+          <span class="form-error-msg" id="formError">Something went wrong. Please try again or email us directly.</span>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-logo">Ev<span>a</span>ntis</div>
+  <p class="footer-copy">&copy; 2026 Evantis. All rights reserved.</p>
+  <nav>
+    <a href="#services">Services</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</footer>
+
+<!-- ── Vendor Profile Modal ──────────────────────────────────────────────── -->
+<div class="vendor-modal-overlay" id="vendorModalOverlay">
+  <div class="vendor-modal" id="vendorModal">
+    <button class="vendor-modal-close" onclick="closeVendorModal()">✕</button>
+    <div class="vendor-modal-img" id="modalImg">◎</div>
+    <div class="vendor-modal-body">
+      <p class="vendor-modal-cat" id="modalCat"></p>
+      <h2 class="vendor-modal-name" id="modalName"></h2>
+      <p class="vendor-modal-brand" id="modalBrand"></p>
+      <p class="vendor-modal-bio" id="modalBio"></p>
+      <div class="vendor-modal-meta" id="modalMeta"></div>
+      <div id="modalPackages"></div>
+      <div class="vendor-modal-actions">
+        <button class="btn btn-gold" onclick="inquireVendor()">Send Inquiry</button>
+        <button class="btn btn-outline" onclick="closeVendorModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Custom cursor
+  const cursor = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // ── Sticky nav
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── Mobile menu
+  function toggleMobile() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+    document.getElementById('hamburger').classList.toggle('open');
+  }
+  function closeMobile() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.getElementById('hamburger').classList.remove('open');
+  }
+
+  // ── Scroll reveal
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+  // ── Vendor listings
+  let currentVendorId = null;
+
+  async function loadVendors(category, containerId) {
+    const grid = document.getElementById(containerId);
+    try {
+      const res = await fetch(`http://localhost:8080/api/vendors?category=${category}`);
+      const vendors = await res.json();
+      if (!vendors.length) {
+        grid.innerHTML = '<p class="vendors-empty">No vendors listed yet — check back soon.</p>';
+        return;
+      }
+      grid.innerHTML = vendors.map(v => `
+        <div class="vendor-card reveal" onclick="openVendorModal(${v.id})">
+          <div class="vendor-card-img">
+            ${v.profileImageUrl ? `<img src="${v.profileImageUrl}" alt="${v.brandName || v.name}">` : '◎'}
+          </div>
+          <div class="vendor-card-body">
+            <h3 class="vendor-card-name">${v.brandName || v.name}</h3>
+            ${v.location ? `<p class="vendor-card-location">${v.location}</p>` : ''}
+            ${v.bio ? `<p class="vendor-card-bio">${v.bio}</p>` : ''}
+            <span class="btn btn-outline" style="font-size:0.78rem;padding:0.45rem 1.1rem;pointer-events:none;">View Profile</span>
+          </div>
+        </div>
+      `).join('');
+      grid.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+    } catch (e) {
+      grid.innerHTML = '<p class="vendors-empty">Unable to load vendors at this time.</p>';
+    }
+  }
+
+  async function openVendorModal(id) {
+    try {
+      const res = await fetch(`http://localhost:8080/api/vendors/${id}`);
+      const v = await res.json();
+      currentVendorId = v.id;
+
+      const imgEl = document.getElementById('modalImg');
+      imgEl.innerHTML = v.profileImageUrl
+        ? `<img src="${v.profileImageUrl}" alt="${v.brandName || v.name}">`
+        : '◎';
+
+      document.getElementById('modalCat').textContent =
+        v.category === 'PHOTOGRAPHY' ? 'Photography' : 'Event Decoration';
+      document.getElementById('modalName').textContent = v.brandName || v.name;
+      document.getElementById('modalBrand').textContent =
+        (v.brandName && v.brandName !== v.name) ? v.name : '';
+      document.getElementById('modalBio').textContent = v.bio || '';
+
+      const parts = [];
+      if (v.location) parts.push(`<span>${v.location}</span>`);
+      if (v.email)    parts.push(`<a href="mailto:${v.email}">${v.email}</a>`);
+      if (v.phone)    parts.push(`<span>${v.phone}</span>`);
+      if (v.websiteUrl) parts.push(`<a href="${v.websiteUrl}" target="_blank" rel="noopener">${v.websiteUrl}</a>`);
+      document.getElementById('modalMeta').innerHTML = parts.join('');
+
+      // Fetch packages
+      const pkgRes = await fetch(`http://localhost:8080/api/vendors/${id}/packages`);
+      const packages = await pkgRes.json();
+      const pkgContainer = document.getElementById('modalPackages');
+      if (packages.length) {
+        pkgContainer.innerHTML = `
+          <p class="modal-packages-title">Packages</p>
+          <div class="modal-packages-grid">
+            ${packages.map(p => `
+              <div class="modal-pkg-card">
+                <p class="modal-pkg-name">${p.name}</p>
+                <p class="modal-pkg-price">${p.priceLabel || ''}</p>
+                ${p.description ? `<p class="modal-pkg-desc">${p.description}</p>` : ''}
+                <ul class="modal-pkg-features">
+                  ${(p.features || []).map(f => `<li>${f}</li>`).join('')}
+                </ul>
+              </div>
+            `).join('')}
+          </div>`;
+      } else {
+        pkgContainer.innerHTML = '';
+      }
+
+      document.getElementById('vendorModalOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    } catch (e) {
+      console.error('Failed to load vendor', e);
+    }
+  }
+
+  function closeVendorModal() {
+    document.getElementById('vendorModalOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('vendorModalOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeVendorModal();
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeVendorModal();
+  });
+
+  function inquireVendor() {
+    closeVendorModal();
+    document.getElementById('inquiryForm').dataset.vendorId = currentVendorId;
+    document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  loadVendors('PHOTOGRAPHY', 'photographersGrid');
+  loadVendors('EVENT_DECORATION', 'decoratorsGrid');
+
+  // ── Inquiry form submission
+  document.getElementById('inquiryForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const successEl = document.getElementById('formSuccess');
+    const errorEl   = document.getElementById('formError');
+
+    btn.textContent = 'Sending...';
+    btn.disabled = true;
+    errorEl.classList.remove('visible');
+
+    const payload = {
+      name:       document.getElementById('name').value.trim(),
+      email:      document.getElementById('email').value.trim(),
+      phone:      document.getElementById('phone').value.trim() || null,
+      eventType:  document.getElementById('eventType').value || null,
+      eventDate:  document.getElementById('eventDate').value || null,
+      guestCount: document.getElementById('guestCount').value ? parseInt(document.getElementById('guestCount').value) : null,
+      budget:     document.getElementById('budget').value ? parseFloat(document.getElementById('budget').value) : null,
+      location:   document.getElementById('location').value.trim() || null,
+      message:    document.getElementById('message').value.trim() || null,
+      vendorId:   this.dataset.vendorId ? parseInt(this.dataset.vendorId) : null,
+    };
+
+    try {
+      const res = await fetch('http://localhost:8080/api/inquiries', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        this.reset();
+        delete this.dataset.vendorId;
+        successEl.classList.add('visible');
+        setTimeout(() => {
+          successEl.classList.remove('visible');
+          btn.textContent = 'Send Inquiry';
+          btn.disabled = false;
+        }, 10000);
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      errorEl.classList.add('visible');
+      btn.textContent = 'Send Inquiry';
+      btn.disabled = false;
+    }
+  });
+</script>
+</body>
+</html>
